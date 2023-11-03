@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "oom/conditional",
+    "version": "0.1.0",
+    "title": "OoM conditional",
+    "category": "widgets",
+    "icon": "smiley",
+    "description": "Conditional block container.",
+    "textdomain": "order-of-mass",
+    "supports": {
+        "html": false
+    },
+    "attributes": {
+        "bafiky": {
+            "type": "object",
+            "default": {
+                "mo": "1",
+                "tu": "1",
+                "we": "1",
+                "th": "1",
+                "fr": "1",
+                "sa": "1",
+                "su": "1"
+            }
+        }
+    },
+    "editorScript": "file:../../resources/oom-conditional.js",
+    "editorStyle": "file:../css/oom-conditional.css"
+}
