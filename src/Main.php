@@ -38,6 +38,7 @@ class Main {
 		$container_builder->addDefinitions(
 			array(
 				LoggerInterface::class => \DI\create( Log::class )->constructor(),
+				GlobalJS::class => \DI\create( GlobalJS::class )->constructor(),
 				BCP47::class => \DI\create( BCP47::class )->constructor(
 					\DI\get( LoggerInterface::class )
 				),
@@ -86,7 +87,7 @@ class Main {
 	 *
 	 * @return Main
 	 */
-	public static function new() {
+	public static function new(): Main {
 		if ( null === self::$me ) {
 			self::$me = new self();
 		}
@@ -99,12 +100,44 @@ class Main {
 	 * @return void
 	 */
 	public function run() {
+		/**
+		 * Undocumented.
+		 *
+		 * @var GlobalJS
+		 */
+		$global_js = $this->container->get( GlobalJS::class );
+		/**
+		 * Undocumented.
+		 *
+		 * @var Commands
+		 */
 		$commands = $this->container->get( Commands::class );
+		/**
+		 * Undocumented.
+		 *
+		 * @var Conditional
+		 */
 		$conditional = $this->container->get( Conditional::class );
+		/**
+		 * Undocumented.
+		 *
+		 * @var Labels
+		 */
 		$labels = $this->container->get( Labels::class );
+		/**
+		 * Undocumented.
+		 *
+		 * @var Lectionary
+		 */
 		$lectionary = $this->container->get( Lectionary::class );
+		/**
+		 * Undocumented.
+		 *
+		 * @var VirtualPage
+		 */
 		$virtual_page = $this->container->get( VirtualPage::class );
 
+		$global_js->register();
 		$commands->register();
 		$conditional->register();
 		$labels->register();

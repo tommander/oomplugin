@@ -43,6 +43,43 @@ class Labels {
 		add_filter( 'allowed_options', array( $this, 'allowed_options' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		$js_file = plugin_dir_url( __FILE__ ) . '../resources/oom-labels.js';
+		wp_enqueue_script( 'oomplugin-labels-js', $js_file, array(), microtime(), array() );
+
+		/**
+		 * Undocumented var.
+		 *
+		 * @var array<array-key, array{lang: string, code: string}>
+		 */
+		$js_languages = array();
+		$this->loop_languages(
+			function ( string $code ) use ( &$js_languages ) {
+				/**
+				 * Undocumented psalm suppress.
+				 *
+				 * @psalm-suppress MixedArrayAssignment
+				 */
+				$js_languages[] = array(
+					'lang' => $this->bcp47->get_lang_name( $code ),
+					'code' => $code,
+				);
+			}
+		);
+
+		wp_add_inline_script(
+			'oomplugin-globals-js',
+			'window.oom.languages = ' . json_encode( $js_languages ) . ';',
+			'after'
+		);
 	}
 
 	/**
@@ -90,46 +127,32 @@ class Labels {
 	 * @return void
 	 */
 	public function render_languages( $args ) {
-		echo '<table id="oomlabels-table-languages">';
-		echo '<tr><th>Code</th><th>Language</th></tr>';
-		$key = 1;
-		$this->loop_languages(
-			function ( string $code ) use ( &$key ) {
-				$lang = $this->bcp47->get_lang_name( $code );
-				echo '<tr>';
-				echo '<td><input name="oomlabels-languages[' . esc_attr( $key ) . ']" id="oomlabels-languages_' . esc_attr( $key ) . '_code" type="text" value="' . esc_attr( $code ) . '" /></td>';
-				echo '<td>' . esc_html( $lang ) . '</td>';
-				echo '</tr>';
-				$key++;
-			}
-		);
-
-		echo '</table>';
-		echo '<div><button id="oomlabels-languages-add_row" type="button">Add row</button></div>';
-		echo '<script>
-		  const btnLangAddRow = document.getElementById("oomlabels-languages-add_row");
-		  if (btnLangAddRow) {
-			btnLangAddRow.addEventListener("click", () => {
-			  const tblTestArr = document.getElementById("oomlabels-table-languages");
-			  if (!tblTestArr) {
-				return;
-			  }
-			  const trNewRow = tblTestArr.insertRow();
-			  if (!trNewRow) {
-				return;
-			  }
-			  const tdLabel = trNewRow.insertCell();
-			  const inpLabel = document.createElement("input");
-			  inpLabel.name = "oomlabels-languages["+trNewRow.rowIndex+"]";
-			  inpLabel.id = "oomlabels-languages"+trNewRow.rowIndex+"_code";
-			  inpLabel.type = "text";
-			  inpLabel.value = "";
-			  tdLabel.appendChild(inpLabel);
-
-			  const tdLang = trNewRow.insertCell();
-			});
-		  }
-		</script>';
+		?>
+		<table id="oomlabels-table-languages">
+			<tr>
+				<th>Code</th>
+				<th>Language</th>
+			</tr>
+			<?php
+			$key = 1;
+			$this->loop_languages(
+				function ( string $code ) use ( &$key ) {
+					$lang = $this->bcp47->get_lang_name( $code );
+					?>
+			<tr>
+				<td><input name="oomlabels-languages[<?php echo esc_attr( (string) $key ); ?>]" id="oomlabels-languages_<?php echo esc_attr( (string) $key ); ?>_code" type="text" value="<?php echo esc_attr( $code ); ?>" /></td>
+				<td><?php echo esc_html( $lang ); ?></td>';
+			</tr>
+					<?php
+					if ( is_int( $key ) ) {
+						$key++;
+					}
+				}
+			);
+		?>
+		</table>
+		<div><button id="oomlabels-languages-add_row" type="button">Add row</button></div>
+		<?php
 	}
 
 	/**
@@ -140,70 +163,49 @@ class Labels {
 	 * @return void
 	 */
 	public function render_list( $args ) {
-		echo '<table id="oomlabels-table-list">';
-		echo '<tr>';
-		echo '<th>Label</th>';
-		$js_languages = '[';
-		$this->loop_languages(
-			function ( string $code ) use ( &$js_languages ) {
-				$lang = $this->bcp47->get_lang_name( $code );
-				echo '<th>' . esc_html( $lang ) . '</th>';
-				$js_languages .= '{lang: "' . $lang . '", code: "' . $code . '"},';
-			}
-		);
-		$js_languages .= ']';
-		echo '</tr>';
-		$key = 1;
-		$this->loop_list(
-			function ( array $list_item ) use ( $key ) {
-				$label = $list_item['label'] ?? '';
-				echo '<tr>';
-				echo '<td><input name="oomlabels-list[' . esc_attr( strval( $key ) ) . '][label]" id="oomlabels-list_' . esc_attr( strval( $key ) ) . '_label" type="text" value="' . esc_attr( $label ) . '" /></td>';
+		?>
+		<table id="oomlabels-table-list">
+			<tr>
+				<th>Label</th>
+				<?php
 				$this->loop_languages(
-					function ( string $code ) use ( $list_item, $key, $label ) {
-						$trans = $list_item[ $code ] ?? $label;
-						echo '<td><input name="oomlabels-list[' . esc_attr( strval( $key ) ) . '][' . esc_attr( $code ) . ']" id="oomlabels-list_' . esc_attr( strval( $key ) ) . '_' . esc_attr( $code ) . '" type="text" value="' . esc_attr( $trans ) . '" /></td>';
+					function ( string $code ) {
+						?>
+				<th><?php echo esc_html( $this->bcp47->get_lang_name( $code ) ); ?></th>
+						<?php
 					}
 				);
-				echo '</tr>';
-				$key++;
-			}
-		);
-		echo '</table>';
-		echo '<div><button id="oomlabels-list-add_row" type="button">Add row</button></div>';
-		echo '<script>
-		  const arrLanguages = ' . esc_js( $js_languages ) . ';
-		  const btnListAddRow = document.getElementById("oomlabels-list-add_row");
-		  if (btnListAddRow) {
-			btnListAddRow.addEventListener("click", () => {
-			  const tblTestArr = document.getElementById("oomlabels-table-list");
-			  if (!tblTestArr) {
-				return;
-			  }
-			  const trNewRow = tblTestArr.insertRow();
-			  if (!trNewRow) {
-				return;
-			  }
-			  const tdLabel = trNewRow.insertCell();
-			  const inpLabel = document.createElement("input");
-			  inpLabel.name = "oomlabels-list["+trNewRow.rowIndex+"][label]";
-			  inpLabel.id = "oomlabels-list_"+trNewRow.rowIndex+"_label";
-			  inpLabel.type = "text";
-			  inpLabel.value = "";
-			  tdLabel.appendChild(inpLabel);
-
-			  for (const langObj of arrLanguages) {
-				const tdLang = trNewRow.insertCell();
-				const inpLang = document.createElement("input");
-				inpLang.name = "oomlabels-list["+trNewRow.rowIndex+"]["+langObj.code+"]";
-				inpLang.id = "oomlabels-list_"+trNewRow.rowIndex+"_"+langObj.code;
-				inpLang.type = "text";
-				inpLang.value = "";
-				tdLang.appendChild(inpLang);
-			  }
-			});
-		  }
-		</script>';
+		?>
+			</tr>
+			<?php
+			$key = 1;
+			$this->loop_list(
+				function ( array $list_item ) use ( &$key ) {
+					$label = (string) $list_item['label'];
+					?>
+			<tr>
+				<td><input name="oomlabels-list[<?php echo esc_attr( (string) $key ); ?>][label]" id="oomlabels-list_<?php echo esc_attr( (string) $key ); ?>_label" type="text" value="<?php echo esc_attr( $label ); ?>" /></td>
+					<?php
+					$this->loop_languages(
+						function ( string $code ) use ( $list_item, $key, $label ) {
+							$trans = is_string( $list_item[ $code ] ) ? $list_item[ $code ] : $label;
+							?>
+				<td><input name="oomlabels-list[<?php echo esc_attr( (string) $key ); ?>][<?php echo esc_attr( $code ); ?>]" id="oomlabels-list_<?php echo esc_attr( (string) $key ); ?>_<?php echo esc_attr( $code ); ?>" type="text" value="<?php echo esc_attr( $trans ); ?>" /></td>
+							<?php
+						}
+					);
+					?>
+			</tr>
+					<?php
+					if ( is_int( $key ) ) {
+						$key++;
+					}
+				}
+			);
+		?>
+		</table>
+		<div><button id="oomlabels-list-add_row" type="button">Add row</button></div>
+		<?php
 	}
 
 	/**
@@ -216,10 +218,7 @@ class Labels {
 	 * @return string
 	 */
 	public function shortcode_oomlabel( $atts, $content, $shortcode_tag ) {
-		$opt = get_option( 'oomlabels-list' );
-		if ( is_array( $opt ) !== true ) {
-			$opt = array();
-		}
+		$opt = (array) get_option( 'oomlabels-list' );
 
 		if ( empty( $content ) ) {
 			return '<span class="oomlabel oomlabelerror">Label text not defined</span>';
@@ -230,7 +229,7 @@ class Labels {
 			if ( is_array( $opt_val ) !== true ) {
 				continue;
 			}
-			if ( isset( $opt_val['label'] ) !== true ) {
+			if ( isset( $opt_val['label'] ) !== true || is_string( $opt_val['label'] ) !== true ) {
 				continue;
 			}
 
@@ -247,7 +246,7 @@ class Labels {
 		$param_labels = $this->parameters->get_parameter( Parameters::PARAMETER_LABELS );
 		$label_text = $label['label'];
 		if ( isset( $label[ $param_labels ] ) === true ) {
-			$label_text = $label[ $param_labels ];
+			$label_text = (string) $label[ $param_labels ];
 		}
 
 		return '<span class="oomlabel">' . esc_html( $label_text ) . '</span>';
@@ -260,11 +259,15 @@ class Labels {
 	 */
 	public function render_options(): void {
 		$current_option = $this->parameters->get_parameter( Parameters::PARAMETER_LABELS );
-		echo '<option value="en-US"' . selected( $current_option, 'en-US', false ) . '>English</option>';
+		?>
+		<option value="en-US"<?php selected( $current_option, 'en-US' ); ?>>English</option>
+		<?php
 		$this->loop_languages(
 			function ( string $code ) use ( &$options, $current_option ) {
 				$lang = $this->bcp47->get_lang_name( $code );
-				echo '<option value="' . esc_attr( $code ) . '"' . selected( $current_option, $code, false ) . '>' . esc_html( $lang ) . '</option>';
+				?>
+		<option value="<?php echo esc_attr( $code ); ?>"<?php selected( $current_option, $code ); ?>><?php echo esc_html( $lang ); ?></option>';
+				<?php
 			}
 		);
 	}
@@ -286,14 +289,13 @@ class Labels {
 	 * @return void
 	 */
 	private function loop_languages( callable $loop_fcn ) {
-		$opt = get_option( 'oomlabels-languages' );
-		if ( is_array( $opt ) !== true ) {
-			$opt = array();
-		}
+		/**
+		 * Undocumented.
+		 *
+		 * @var list{string}
+		 */
+		$opt = (array) get_option( 'oomlabels-languages' );
 		foreach ( $opt as $code ) {
-			if ( is_string( $code ) !== true ) {
-				$code = 'zxx';
-			}
 			call_user_func( $loop_fcn, $code );
 		}
 	}
@@ -306,14 +308,13 @@ class Labels {
 	 * @return void
 	 */
 	private function loop_list( callable $loop_fcn ) {
-		$opt = get_option( 'oomlabels-list' );
-		if ( is_array( $opt ) !== true ) {
-			$opt = array();
-		}
+		/**
+		 * Undocumented.
+		 *
+		 * @var list{array}
+		 */
+		$opt = (array) get_option( 'oomlabels-list' );
 		foreach ( $opt as $list_item ) {
-			if ( is_array( $list_item ) !== true ) {
-				$list_item = array();
-			}
 			call_user_func( $loop_fcn, $list_item );
 		}
 	}
@@ -326,6 +327,9 @@ class Labels {
 	 * @return mixed
 	 */
 	public function allowed_options( $options ) {
+		if ( true !== is_array( $options ) ) {
+			return $options;
+		}
 		$options['oomlabels-settings'] = array( 'oomlabels-languages', 'oomlabels-list' );
 		return $options;
 	}

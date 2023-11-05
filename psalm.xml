@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="4"
+    errorLevel="1"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     findUnusedBaselineEntry="true"
     findUnusedCode="false"
+    reportMixedIssues="true"
+    findUnusedPsalmSuppress="true"
 >
     <projectFiles>
         <file name="oomplugin.php" />
@@ -17,5 +19,12 @@
     </projectFiles>
     <stubs>
         <file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php" />
+        <file name="stubs/wp-additional.phpstub" />
     </stubs>
+    <forbiddenFunctions>
+        <function name="var_dump" />
+        <function name="var_export" />
+        <function name="print_r" />
+        <function name="eval" />
+    </forbiddenFunctions>
 </psalm>

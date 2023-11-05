@@ -26,7 +26,7 @@ class Log extends AbstractLogger {
 	 */
 	public function log( $level, string|\Stringable $message, array $context = array() ): void {
 		if ( in_array( $level, array( LogLevel::EMERGENCY, LogLevel::ALERT, LogLevel::CRITICAL, LogLevel::ERROR, LogLevel::WARNING, LogLevel::NOTICE, LogLevel::INFO, LogLevel::DEBUG ), true ) !== true ) {
-			throw new InvalidArgumentException( 'Paramer $level "' . esc_html( strval( $level ) ) . '" for function Log::log is incorrect.' );
+			throw new InvalidArgumentException( 'Paramer $level "' . esc_html( (string) $level ) . '" for function Log::log is incorrect.' );
 		}
 		$log_file = __DIR__ . '/../log.txt';
 		$log_file_handle = fopen( $log_file, 'a' );
@@ -36,6 +36,11 @@ class Log extends AbstractLogger {
 		try {
 			$log_message_context = '';
 			if ( count( $context ) > 0 ) {
+				/**
+				 * Using var_export is OK here.
+				 *
+				 * @psalm-suppress ForbiddenCode
+				 */
 				$log_message_context = PHP_EOL . var_export( $context, true );
 			}
 			$log_message = sprintf(

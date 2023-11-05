@@ -58,11 +58,11 @@ class BCP47 {
 		$this->log = $log;
 
 		$json_raw = file_get_contents( __DIR__ . '/../assets/json/bcp47.json' );
+		/**
+		 * Undocumented var.
+		 *
+		 * @var array */
 		$json_dec = json_decode( $json_raw, true );
-		if ( is_array( $json_dec ) !== true ) {
-			\wp_die( 'BCP47 JSON data cannot be decoded' );
-		}
-
 		$this->data = $this->array_change_key_case_recursive( $json_dec );
 	}
 
@@ -100,17 +100,17 @@ class BCP47 {
 				if ( isset( $this->data['language'][ $identifier_part_low ] ) !== true || is_array( $this->data['language'][ $identifier_part_low ] ) !== true || isset( $this->data['language'][ $identifier_part_low ]['description'] ) !== true ) {
 					return 'First part is unknown';
 				}
-				$ret = $this->data['language'][ $identifier_part_low ]['description'];
+				$ret = (string) $this->data['language'][ $identifier_part_low ]['description'];
 				continue;
 			}
-			foreach ( $this->data as $subtag_key => $subtag_val ) {
+			foreach ( array_keys( $this->data ) as $subtag_key ) {
 				if ( 'language' === $subtag_key ) {
 					continue;
 				}
 				if ( isset( $this->data[ $subtag_key ][ $identifier_part_low ] ) !== true || is_array( $this->data[ $subtag_key ][ $identifier_part_low ] ) !== true || isset( $this->data[ $subtag_key ][ $identifier_part_low ]['description'] ) !== true ) {
 					continue;
 				}
-				$ret .= ' (' . $this->data[ $subtag_key ][ $identifier_part_low ]['description'] . ')';
+				$ret .= ' (' . (string) $this->data[ $subtag_key ][ $identifier_part_low ]['description'] . ')';
 			}
 		}
 		return $ret;

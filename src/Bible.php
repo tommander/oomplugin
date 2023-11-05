@@ -59,22 +59,20 @@ class Bible {
 		 */
 		global $wpdb;
 		/**
-		 * Due to ARRAY_A.
+		 * Hello
 		 *
-		 * @psalm-suppress UndefinedConstant
+		 * @var array<string, array{language: string,title: string,identifier:string}>
 		 */
 		$res = $wpdb->get_results( 'SELECT title,identifier,language FROM ' . $wpdb->prefix . 'bible', ARRAY_A );
 		$ret_arr = array();
-		if ( true === is_array( $res ) ) {
-			foreach ( $res as $translation ) {
-				if ( isset( $ret_arr[ $translation['language'] ] ) !== true ) {
-					$ret_arr[ $translation['language'] ] = array();
-				}
-				$ret_arr[ $translation['language'] ][] = array(
-					'title' => $translation['title'],
-					'identifier' => $translation['identifier'],
-				);
+		foreach ( $res as $translation ) {
+			if ( isset( $ret_arr[ $translation['language'] ] ) !== true ) {
+				$ret_arr[ $translation['language'] ] = array();
 			}
+			$ret_arr[ $translation['language'] ][] = array(
+				'title' => $translation['title'],
+				'identifier' => $translation['identifier'],
+			);
 		}
 
 		$current_bible = $this->parameters->get_parameter( Parameters::PARAMETER_BIBLE );

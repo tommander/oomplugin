@@ -64,8 +64,8 @@ class Conditional {
 	/**
 	 * Undocumented function
 	 *
-	 * @param array  $block_attributes Block attributes.
-	 * @param string $content          Content.
+	 * @param array{bafiky: array<string, string>} $block_attributes Block attributes.
+	 * @param string                               $content          Content.
 	 * @throws \Exception Wrong global date param.
 	 * @return void
 	 */

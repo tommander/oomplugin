@@ -37,7 +37,7 @@ class VirtualPage {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_filter( 'display_post_states', array( $this, 'filter_post_states' ), 10, 2 );
 		add_filter( 'the_content', array( $this, 'filter_the_content' ) );
-		add_action( 'save_post', array( $this, 'save_post_meta' ) );
+		add_action( 'save_post', array( $this, 'save_post_meta' ), 10, 3 );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class VirtualPage {
 	 * @return string
 	 */
 	public function is_virtual_page( int $post_id ): string {
-		$oom_virtual_page = get_post_meta( $post_id, 'oom-virtualpage', true );
+		$oom_virtual_page = (string) get_post_meta( $post_id, 'oom-virtualpage', true );
 		if ( in_array( $oom_virtual_page, array( '0', '1' ), true ) !== true ) {
 			$oom_virtual_page = '0';
 		}
@@ -74,20 +74,25 @@ class VirtualPage {
 	public function render_metabox() {
 		$oom_virtual_page = '0';
 		$curr_post = get_post();
+		$curr_post_id = 0;
 		if ( is_a( $curr_post, \WP_Post::class ) === true ) {
-			$oom_virtual_page = $this->is_virtual_page( $curr_post->ID );
+			$curr_post_id = $curr_post->ID;
 		}
+
+		$oom_virtual_page = $this->is_virtual_page( $curr_post_id );
 
 		printf(
 			<<<EOS
-        <div class="oomvirtualpage_meta_container">
-            <label for="oomvirtualpage_meta">
-                <input type="checkbox" id="oomvirtualpage_meta" name="oom-virtualpage" value="1"%1\$s>
-                Is virtual parent?
-            </label>
-        </div>
-        EOS,
+		<div class="oomvirtualpage_meta_container">
+			<input type="hidden" id="oomvirtualpage_metanonce" name="oom-virtualpage-nonce" value="%2\$s" />
+			<label for="oomvirtualpage_meta">
+				<input type="checkbox" id="oomvirtualpage_meta" name="oom-virtualpage" value="1"%1\$s>
+				Is virtual parent?
+			</label>
+		</div>
+		EOS,
 			checked( '1', $oom_virtual_page, false ),
+			sanitize_key( wp_create_nonce( 'virtualpage_' . strval( $curr_post_id ) ) )
 		);
 	}
 
@@ -262,20 +267,43 @@ class VirtualPage {
 	/**
 	 * Undocumented function
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int      $post_id Post ID.
+	 * @param \WP_Post $post    Post.
+	 * @param bool     $update  Update.
 	 *
 	 * @return void
 	 */
-	public function save_post_meta( int $post_id ) {
-		if ( true !== isset( $_POST['oom-virtualpage-nonce'] ) || true !== is_string( $_POST['oom-virtualpage-nonce'] ) ) {
+	public function save_post_meta( int $post_id, \WP_Post $post, bool $update ) {
+		// Check that VirtualPage nonce exists.
+		if ( true !== array_key_exists( 'oom-virtualpage-nonce', $_POST ) || true !== is_string( $_POST['oom-virtualpage-nonce'] ) ) {
+			$this->log->debug( 'Save Post Content - no VirtualPage nonce found or not string.' );
 			return;
 		}
-		if ( false === wp_verify_nonce( sanitize_key( wp_unslash( $_POST['oom-virtualpage-nonce'] ) ), 'save_vp_meta' ) ) {
+
+		// Verify nonce.
+		$nonce = sanitize_key( wp_unslash( $_POST['oom-virtualpage-nonce'] ) );
+		if ( false === wp_verify_nonce( $nonce, 'virtualpage_' . strval( $post_id ) ) ) {
+			$this->log->notice( 'Save Post Content - invalid nonce.', array( 'nonce' => $nonce ) );
 			return;
 		}
+
 		$post_unslashed = wp_unslash( $_POST );
+
+		// Prepare new meta value.
+		$meta_value = '0';
 		if ( array_key_exists( 'oom-virtualpage', $post_unslashed ) === true ) {
-			update_post_meta( $post_id, 'oom-virtualpage', $post_unslashed['oom-virtualpage'] );
+			$meta_value = $post_unslashed['oom-virtualpage'];
 		}
+
+		// Update.
+		$res = update_post_meta( $post_id, 'oom-virtualpage', $meta_value );
+		$this->log->debug(
+			'Save Post Content - VirtualPage updated.',
+			array(
+				'post_id' => $post_id,
+				'new_value' => $meta_value,
+				'res' => $res,
+			)
+		);
 	}
 }

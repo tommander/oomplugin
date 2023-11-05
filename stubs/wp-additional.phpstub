@@ -1,0 +1,4 @@
+<?php
+namespace {
+	define('ARRAY_A', 'ARRAY_A');
+}

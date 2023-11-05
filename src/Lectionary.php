@@ -61,9 +61,14 @@ class Lectionary {
 	 * @param string $date       Date.
 	 * @param string $lectionary Lectionary.
 	 *
-	 * @return array
+	 * @return array<string, non-empty-list<string>>
 	 */
 	public function get_reference( string $type, string $date, string $lectionary ): array {
+		/**
+		 * Undocumented
+		 *
+		 * @var \wpdb
+		 */
 		global $wpdb;
 		$lit_year = $this->calendar->liturgical_year( $date );
 		$year_cycle = $this->calendar->year_cycle( $lit_year );
@@ -73,19 +78,25 @@ class Lectionary {
 		/**
 		 * ArrayA.
 		 *
-		 * @psalm-suppress UndefinedConstant
+		 * @var string
+		 */
+		$prep = $wpdb->prepare(
+			'SELECT meta_value, occasion FROM ' . $wpdb->prefix . 'lectionarymeta WHERE lectionary_id=%s AND day_abbr=%s AND (year_cycle=%s OR year_cycle=%s) AND (week_cycle=%s OR week_cycle=%s) AND meta_key=%s',
+			$lect_id,
+			$day_abbr,
+			$year_cycle,
+			'X',
+			$week_cycle,
+			'X',
+			$type
+		);
+		/**
+		 * Undocumented.
+		 *
+		 * @var array<array-key, array<string, string>>|null
 		 */
 		$res = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT meta_value, occasion FROM ' . $wpdb->prefix . 'lectionarymeta WHERE lectionary_id=%s AND day_abbr=%s AND (year_cycle=%s OR year_cycle=%s) AND (week_cycle=%s OR week_cycle=%s) AND meta_key=%s',
-				$lect_id,
-				$day_abbr,
-				$year_cycle,
-				'X',
-				$week_cycle,
-				'X',
-				$type
-			),
+			$prep, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			ARRAY_A
 		);
 		if ( null !== $res ) {
@@ -107,13 +118,20 @@ class Lectionary {
 	 * @return string
 	 */
 	public function lect_id( string $lectref ): string {
-		global $wpdb;
 		/**
-		 * ArrayA.
+		 * Undocumented.
 		 *
-		 * @psalm-suppress UndefinedConstant
+		 * @var \wpdb
 		 */
-		$res = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'lectionaries WHERE reference=%s', $lectref ), ARRAY_A );
+		global $wpdb;
+		$prep = (string) $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'lectionaries WHERE reference=%s', $lectref );
+
+		/**
+		 * Undocumented.
+		 *
+		 * @var array<string, string>|null
+		 */
+		$res = $wpdb->get_row( $prep, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		if ( null !== $res ) {
 			return $res['id'];
 		}
@@ -177,10 +195,10 @@ class Lectionary {
 	/**
 	 * Undocumented function
 	 *
-	 * @param array  $ref             Reference.
-	 * @param string $ref_type        Reference type.
-	 * @param string $heading_element Heading element.
-	 * @param bool   $div             Div.
+	 * @param array<string, non-empty-list<string>> $ref             Reference.
+	 * @param string                                $ref_type        Reference type.
+	 * @param string                                $heading_element Heading element.
+	 * @param bool                                  $div             Div.
 	 *
 	 * @return string
 	 */
@@ -223,7 +241,7 @@ class Lectionary {
 			$shortcode_tag
 		);
 
-		return $this->ref_to_str( $this->get_reference( $content, $safe_atts['date'], $safe_atts['lect'] ), $content );
+		return $this->ref_to_str( $this->get_reference( $content, (string) $safe_atts['date'], (string) $safe_atts['lect'] ), $content );
 	}
 
 	/**

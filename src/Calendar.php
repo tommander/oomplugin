@@ -36,10 +36,7 @@ class Calendar {
 		$this->log = $log;
 
 		$days_json = file_get_contents( __DIR__ . '/../assets/json/day-abbrs.json' );
-		$this->days = json_decode( $days_json, true );
-		if ( is_array( $this->days ) !== true ) {
-			$this->days = array();
-		}
+		$this->days = (array) json_decode( $days_json, true );
 	}
 
 	/**
@@ -53,7 +50,18 @@ class Calendar {
 		$lityear = $this->liturgical_year( $date );
 		$this->generate_calendar( $lityear );
 
+		/**
+		 * WpDb.
+		 *
+		 * @var \wpdb
+		 */
 		global $wpdb;
+
+		/**
+		 * Aaa
+		 *
+		 * @var \DateTimeImmutable|false
+		 */
 		$dti = \DateTimeImmutable::createFromFormat( 'Y-m-d', $date );
 		if ( false === $dti ) {
 			throw new \Exception( 'Date for function Calendar::date_abbr() must be in "Y-m-d" format.' );
@@ -61,14 +69,16 @@ class Calendar {
 		/**
 		 * ArrayA.
 		 *
-		 * @psalm-suppress UndefinedConstant
+		 * @var string
 		 */
-		$res = $wpdb->get_row( $wpdb->prepare( 'SELECT reference FROM ' . $wpdb->prefix . 'calendar WHERE date=%s', $dti->format( 'd.m.Y' ) ), ARRAY_A );
-		if ( null !== $res ) {
-			return $res['reference'];
-		}
-
-		return '';
+		$prep = $wpdb->prepare( 'SELECT reference FROM ' . $wpdb->prefix . 'calendar WHERE date=%s', $dti->format( 'd.m.Y' ) );
+		/**
+		 * ArrayA.
+		 *
+		 * @var array{reference: string}
+		 */
+		$res = $wpdb->get_row( $prep, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return $res['reference'];
 	}
 
 	/**
@@ -79,7 +89,7 @@ class Calendar {
 	 * @return string
 	 */
 	public function abbr_description( string $abbr ): string {
-		return $this->days[ $abbr ] ?? '';
+		return isset( $this->days[ $abbr ] ) ? (string) $this->days[ $abbr ] : '';
 	}
 
 	/**
@@ -160,13 +170,19 @@ class Calendar {
 		}
 
 		// Check whether the calendar already exists.
+		/**
+		 * Undocumented var.
+		 *
+		 * @var \wpdb
+		 */
 		global $wpdb;
 		/**
 		 * ArrayA.
 		 *
-		 * @psalm-suppress UndefinedConstant
+		 * @var string
 		 */
-		$check_cal = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'calendar WHERE liturgical_year=%d', $liturgical_year ), ARRAY_A );
+		$prep = $wpdb->prepare( 'SELECT id FROM ' . $wpdb->prefix . 'calendar WHERE liturgical_year=%d', $liturgical_year );
+		$check_cal = $wpdb->get_row( $prep, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		if ( null !== $check_cal ) {
 			return;
 		}
@@ -320,6 +336,11 @@ class Calendar {
 
 		$calendar = \array_merge( $calendar, \array_reverse( $days_tmp, true ) );
 
+		/**
+		 * Undocumented var.
+		 *
+		 * @var \wpdb
+		 */
 		global $wpdb;
 		foreach ( $calendar as $cal_date => $cal_ref ) {
 			$wpdb->insert(
