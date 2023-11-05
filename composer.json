@@ -1,4 +1,22 @@
 {
+    "name": "tmd/oomplugin",
+    "description": "Order of Mass Plugin",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomáš Rajnoha",
+            "email": "tomas.rajnoha@tommander.cz",
+            "homepage": "https://tommander.cz",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "oomplugin@tommander.cz",
+        "issues": "https://github.com/tommander/oomplugin/issues",
+        "source": "https://github.com/tommander/oomplugin"
+    },
     "scripts": {
         "phpunit": "phpunit",
         "phpcs": "phpcs",
