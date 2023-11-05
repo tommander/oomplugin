@@ -3,10 +3,30 @@ name: PHP Composer
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches:
+      - 'main'
+      - 'development'
+    paths:
+      - '**.php'
+      - '**.phpstub'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpcs.xml.dist'
+      - 'psalm.xml'
+      - '.github/workflows/php.yml'
   pull_request:
-    branches: [ "main" ]
-
+    branches:
+      - 'main'
+      - 'development'
+    paths:
+      - '**.php'
+      - '**.phpstub'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpcs.xml.dist'
+      - 'psalm.xml'
+      - '.github/workflows/php.yml'
+  
 permissions:
   contents: read
 
