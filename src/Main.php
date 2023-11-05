@@ -70,6 +70,7 @@ class Main {
 				),
 				Lectionary::class => \DI\create( Lectionary::class )->constructor(
 					\DI\get( Calendar::class ),
+					\DI\get( Labels::class ),
 					\DI\get( LoggerInterface::class ),
 					\DI\get( Parameters::class )
 				),

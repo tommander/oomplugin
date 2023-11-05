@@ -69,27 +69,16 @@ class BCP47 {
 	/**
 	 * Undocumented function
 	 *
-	 * @return bool
-	 */
-	private function check_data(): bool {
-		if ( array_key_exists( 'language', $this->data ) !== true ) {
-			return false;
-		}
-
-		// Let's say the other parts of BCP47 (extlang, script, ...) are not
-		// *that* important, so we don't have to rely on their existence.
-		return true;
-	}
-
-	/**
-	 * Undocumented function
-	 *
 	 * @param string $identifier Identifier.
 	 *
 	 * @return string
 	 */
 	public function get_lang_name( string $identifier ): string {
-		if ( $this->check_data() !== true ) {
+		if (
+			array_key_exists( 'language', $this->data ) !== true ||
+			is_array( $this->data['language'] ) !== true
+		) {
+			$this->log->notice( 'List of language tags not found in data', array( 'data' => $this->data ) );
 			return 'Check failed';
 		}
 		$identifier_parts = explode( '-', $identifier );
@@ -98,10 +87,12 @@ class BCP47 {
 			$identifier_part_low = strtolower( $identifier_part );
 			if ( 0 === $key ) {
 				if ( isset( $this->data['language'][ $identifier_part_low ] ) !== true || is_array( $this->data['language'][ $identifier_part_low ] ) !== true || isset( $this->data['language'][ $identifier_part_low ]['description'] ) !== true ) {
+					$this->log->notice( 'Unknown language tag "' . $identifier_part_low . '"' );
 					return 'First part is unknown';
+				} else {
+					$ret = (string) $this->data['language'][ $identifier_part_low ]['description'];
+					continue;
 				}
-				$ret = (string) $this->data['language'][ $identifier_part_low ]['description'];
-				continue;
 			}
 			foreach ( array_keys( $this->data ) as $subtag_key ) {
 				if ( 'language' === $subtag_key ) {

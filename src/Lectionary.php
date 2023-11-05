@@ -31,6 +31,12 @@ class Lectionary {
 	 * @var Parameters
 	 */
 	private Parameters $parameters;
+	/**
+	 * Undocumented variable
+	 *
+	 * @var Labels
+	 */
+	private Labels $labels;
 
 	/**
 	 * Undocumented function
@@ -45,11 +51,13 @@ class Lectionary {
 	 * Undocumented function
 	 *
 	 * @param Calendar        $calendar   Calendar.
+	 * @param Labels          $labels     Labels.
 	 * @param LoggerInterface $log        Log.
 	 * @param Parameters      $parameters Parameters.
 	 */
-	public function __construct( Calendar $calendar, LoggerInterface $log, Parameters $parameters ) {
+	public function __construct( Calendar $calendar, Labels $labels, LoggerInterface $log, Parameters $parameters ) {
 		$this->calendar = $calendar;
+		$this->labels = $labels;
 		$this->log = $log;
 		$this->parameters = $parameters;
 	}
@@ -138,75 +146,18 @@ class Lectionary {
 		return '';
 	}
 
-	// Add shortcode to translate reading type (e.g. first reading) to a specific Bible reference using the specified Lectionary (e.g. OLM81)
-	// If there is no such type, return empty string
-	// oomreading_ref('r1', 'OLM81') => 'Ex 22:20-26'
-	// [oomreading-ref lect="OLM81" date="2012-12-21"]r1[/oomreading-ref] => '<span>Ex 22:20-26</span>'
-	// [oomreading-ref lect="OLM81" date="2012-12-21"]r42[/oomreading-ref] => ''.
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param string $ref_type Reference type.
-	 *
-	 * @return string
-	 */
-	public function ref_type_label( string $ref_type ): string {
-
-		if ( 'a' === $ref_type ) {
-			return 'Alleluia';
-		}
-		if ( 'ae' === $ref_type ) {
-			return 'Before Gospel';
-		}
-		if ( 'e' === $ref_type ) {
-			return 'Gospel';
-		}
-		if ( 'ep' === $ref_type ) {
-			return 'Epistola';
-		}
-		if ( in_array( $ref_type, array( 'p', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7' ), true ) === true ) {
-			return 'Responsorial psalm';
-		}
-		if ( 'r1' === $ref_type ) {
-			return 'First reading';
-		}
-		if ( 'r2' === $ref_type ) {
-			return 'Second reading';
-		}
-		if ( 'r3' === $ref_type ) {
-			return 'Third reading';
-		}
-		if ( 'r4' === $ref_type ) {
-			return 'Fourth reading';
-		}
-		if ( 'r5' === $ref_type ) {
-			return 'Fifth reading';
-		}
-		if ( 'r6' === $ref_type ) {
-			return 'Sixth reading';
-		}
-		if ( 'r7' === $ref_type ) {
-			return 'Seventh reading';
-		}
-		return '';
-	}
-
 	/**
 	 * Undocumented function
 	 *
 	 * @param array<string, non-empty-list<string>> $ref             Reference.
-	 * @param string                                $ref_type        Reference type.
-	 * @param string                                $heading_element Heading element.
-	 * @param bool                                  $div             Div.
 	 *
 	 * @return string
 	 */
-	public function ref_to_str( array $ref, string $ref_type, string $heading_element = 'h2', bool $div = true ): string {
+	public function ref_to_str( array $ref ): string {
 		$ret_arr = array();
 		foreach ( $ref as $occasion => $one_ref ) {
 			if ( '' !== $occasion ) {
-				$ret_arr[] = 'Occasion: ' . $occasion;
+				$ret_arr[] = $this->labels->get_label( 'Occasion' ) . ' "' . $this->labels->get_label( $occasion ) . '": ';
 			}
 			foreach ( $one_ref as $one_one_ref ) {
 				$ret_arr[] = $one_one_ref;
@@ -215,11 +166,7 @@ class Lectionary {
 		if ( count( $ret_arr ) === 0 ) {
 			return '';
 		}
-		$ret = sprintf( '<%1$s>%2$s</%1$s>', $heading_element, $this->ref_type_label( $ref_type ) );
-		$ret .= $div ? '<div>' : '<span>';
-		$ret .= implode( $div ? '<br>' : ' ', $ret_arr );
-		$ret .= $div ? '</div>' : '</span>';
-		return $ret;
+		return implode( '<br>', $ret_arr );
 	}
 
 	/**
@@ -241,7 +188,7 @@ class Lectionary {
 			$shortcode_tag
 		);
 
-		return $this->ref_to_str( $this->get_reference( $content, (string) $safe_atts['date'], (string) $safe_atts['lect'] ), $content );
+		return '<span>' . $this->ref_to_str( $this->get_reference( $content, (string) $safe_atts['date'], (string) $safe_atts['lect'] ) ) . '</span>';
 	}
 
 	/**

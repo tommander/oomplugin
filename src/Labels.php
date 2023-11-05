@@ -8,6 +8,7 @@
 namespace TMD\OrderOfMass\Plugin;
 
 use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
 
 /**
  * Undocumented class
@@ -141,7 +142,7 @@ class Labels {
 					?>
 			<tr>
 				<td><input name="oomlabels-languages[<?php echo esc_attr( (string) $key ); ?>]" id="oomlabels-languages_<?php echo esc_attr( (string) $key ); ?>_code" type="text" value="<?php echo esc_attr( $code ); ?>" /></td>
-				<td><?php echo esc_html( $lang ); ?></td>';
+				<td><?php echo esc_html( $lang ); ?></td>
 			</tr>
 					<?php
 					if ( is_int( $key ) ) {
@@ -214,14 +215,14 @@ class Labels {
 	 * @param array  $atts          Atts.
 	 * @param string $content       Content.
 	 * @param string $shortcode_tag Shortcode tag.
-	 *
+	 * @throws InvalidArgumentException Empty content param.
 	 * @return string
 	 */
 	public function shortcode_oomlabel( $atts, $content, $shortcode_tag ) {
 		$opt = (array) get_option( 'oomlabels-list' );
 
 		if ( empty( $content ) ) {
-			return '<span class="oomlabel oomlabelerror">Label text not defined</span>';
+			throw new InvalidArgumentException( self::class . '::' . __FUNCTION__ . ' - param "content" is empty.' );
 		}
 
 		$label = null;
@@ -241,7 +242,8 @@ class Labels {
 			break;
 		}
 		if ( null === $label ) {
-			return '<span class="oomlabel oomlabelerror">Label not found</span>';
+			$this->log->notice( 'Missing label "' . $content . '"', array() );
+			return '';
 		}
 		$param_labels = $this->parameters->get_parameter( Parameters::PARAMETER_LABELS );
 		$label_text = $label['label'];
@@ -250,6 +252,17 @@ class Labels {
 		}
 
 		return '<span class="oomlabel">' . esc_html( $label_text ) . '</span>';
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @param string $label Label.
+	 *
+	 * @return string
+	 */
+	public function get_label( string $label ): string {
+		return $this->shortcode_oomlabel( array(), $label, '' );
 	}
 
 	/**
@@ -341,8 +354,8 @@ class Labels {
 	 */
 	public function admin_menu() {
 		add_options_page(
-			'OoM Labels Settings',
-			'OoM Labels Settings',
+			$this->get_label( 'OoM Labels Settings' ),
+			$this->get_label( 'OoM Labels Settings' ),
 			'manage_options',
 			'oomlabels-settings',
 			array( $this, 'render_settings' ),
@@ -358,21 +371,21 @@ class Labels {
 	public function admin_init() {
 		add_settings_section(
 			'oomlabels-settings-main',
-			'OoM Labels Settings',
+			$this->get_label( 'OoM Labels Settings' ),
 			array( $this, 'render_section_main' ),
 			'oomlabels-settings',
 			array()
 		);
 		add_settings_field(
 			'oomlabels-languages',
-			'Languages',
+			$this->get_label( 'Languages' ),
 			array( $this, 'render_languages' ),
 			'oomlabels-settings',
 			'oomlabels-settings-main'
 		);
 		add_settings_field(
 			'oomlabels-list',
-			'List of labels',
+			$this->get_label( 'List of labels' ),
 			array( $this, 'render_list' ),
 			'oomlabels-settings',
 			'oomlabels-settings-main'
@@ -382,7 +395,7 @@ class Labels {
 			'oomlabels-languages',
 			array(
 				'type' => 'array',
-				'description' => 'Languages available for translation of labels',
+				'description' => $this->get_label( 'Languages available for translation of labels' ),
 				'default' => array(),
 				'show_in_rest' => array(
 					'schema' => array(
@@ -399,7 +412,7 @@ class Labels {
 			'oomlabels-list',
 			array(
 				'type' => 'array',
-				'description' => 'List of translations of labels',
+				'description' => $this->get_label( 'List of translations of labels' ),
 				'default' => array(),
 				'show_in_rest' => false,
 			)
