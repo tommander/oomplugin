@@ -72,10 +72,10 @@ class Mysteries {
 	 */
 	public function get_mystery_long( string $mystery ): string {
 		$mysteries = array(
-			'g' => __( 'Glorious mystery', 'order-of-mass' ),
-			'j' => __( 'Joyful mystery', 'order-of-mass' ),
-			's' => __( 'Sorrowful mystery', 'order-of-mass' ),
-			'l' => __( 'Luminous mystery', 'order-of-mass' ),
+			'g' => __( 'Glorious mysteries', 'order-of-mass' ),
+			'j' => __( 'Joyful mysteries', 'order-of-mass' ),
+			's' => __( 'Sorrowful mysteries', 'order-of-mass' ),
+			'l' => __( 'Luminous mysteries', 'order-of-mass' ),
 		);
 
 		if ( isset( $mysteries[ $mystery ] ) === true ) {
