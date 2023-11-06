@@ -20,6 +20,7 @@
         "phpunit": "phpunit",
         "phpcs": "phpcs",
         "psalm": "psalm --show-info=true --no-file-cache --no-reflection-cache --no-cache",
+        "stubs": "generate-stubs --functions --classes --interfaces --traits --out=oomplugin.phpstub --force oomplugin.php src/",
         "qa": [
             "@phpcs",
             "@psalm"
@@ -35,7 +36,8 @@
         "phpunit/phpunit": "^9.6",
         "ocramius/proxy-manager": "^2.14",
         "wp-coding-standards/wpcs": "^3.0",
-        "php-stubs/wordpress-stubs": "^6.3"
+        "php-stubs/wordpress-stubs": "^6.3",
+        "php-stubs/generator": "^0.8.4"
     },
     "autoload": {
         "psr-4": {
