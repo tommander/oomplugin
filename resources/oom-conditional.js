@@ -129,7 +129,7 @@
 
     const Save = () => {
         const blockProps = blockEditor.useBlockProps.save();
-        return el('p', blockProps, el(blockEditor.InnerBlocks.Content));
+        return el('div', blockProps, el(blockEditor.InnerBlocks.Content));
         //return element.createElement('p', blockProps, 'Save content');
     }
 
