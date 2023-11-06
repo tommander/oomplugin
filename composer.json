@@ -20,7 +20,12 @@
         "phpunit": "phpunit",
         "phpcs": "phpcs",
         "psalm": "psalm --show-info=true --no-file-cache --no-reflection-cache --no-cache",
-        "stubs": "generate-stubs --functions --classes --interfaces --traits --out=oomplugin.phpstub --force oomplugin.php src/",
+        "generate-stubs": "psalm --no-file-cache --no-cache --no-reflection-cache --generate-stubs=stubs/oomplugin-full.phpstub",
+        "clean-stubs": "php phpstub-cleaner.php --input=stubs/oomplugin-full.phpstub --output-min=stubs/oomplugin-min.phpstub --output=stubs/oomplugin.phpstub",
+        "stubs": [
+            "@generate-stubs",
+            "@clean-stubs"
+        ],
         "qa": [
             "@phpcs",
             "@psalm"

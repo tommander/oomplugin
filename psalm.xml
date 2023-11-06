@@ -12,6 +12,7 @@
 >
     <projectFiles>
         <file name="oomplugin.php" />
+        <file name="phpstub-cleaner.php" />
         <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />

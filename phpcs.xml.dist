@@ -3,6 +3,7 @@
     <description>Order of Mass Plugin coding standard.</description>
 
     <file>oomplugin.php</file>
+    <file>phpstub-cleaner.php</file>
     <file>src</file>
     <file>src/Interfaces</file>
 
