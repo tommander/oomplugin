@@ -89,7 +89,7 @@ class Commands {
 				$name = 'fa-handshake';
 				break;
 			case 'bible':
-				$prefix = 'far';
+				$prefix = 'fas';
 				$name = 'fa-book-bible';
 				break;
 			case 'stand':
