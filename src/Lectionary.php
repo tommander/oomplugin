@@ -83,6 +83,7 @@ class Lectionary {
 		$week_cycle = $this->calendar->week_cycle( $lit_year );
 		$day_abbr = $this->calendar->date_abbr( $date );
 		$lect_id = $this->lect_id( $lectionary );
+		$meta_key = ( 'pp' === $type || 'pr' === $type ) ? 'p' : $type;
 		/**
 		 * ArrayA.
 		 *
@@ -96,7 +97,7 @@ class Lectionary {
 			'X',
 			$week_cycle,
 			'X',
-			$type
+			$meta_key
 		);
 		/**
 		 * Undocumented.
@@ -107,15 +108,27 @@ class Lectionary {
 			$prep, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			ARRAY_A
 		);
+		$ret = array();
 		if ( null !== $res ) {
-			$ret = array();
 			foreach ( $res as $one_res ) {
+				if ( 'pp' === $type || 'pr' === $type ) {
+					$arr = explode( '||', $one_res['meta_value'], 2 );
+					if ( count( $arr ) < 2 || 'pp' === $type ) {
+						$ret[ $one_res['occasion'] ] = array( $arr[0] );
+						continue;
+					}
+					if ( count( $arr ) === 2 ) {
+						$ret[ $one_res['occasion'] ] = array( $arr[1] );
+						continue;
+					}
+					continue;
+				}
 				$ret[ $one_res['occasion'] ] = explode( '||', $one_res['meta_value'] );
+				// A$ret[ $one_res['occasion'] ] = $one_res['meta_value'];.
 			}
-			return $ret;
 		}
 
-		return array();
+		return $ret;
 	}
 
 	/**
