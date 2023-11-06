@@ -17,6 +17,12 @@ class Commands {
 	/**
 	 * Undocumented variable
 	 *
+	 * @var Labels
+	 */
+	private Labels $labels;
+	/**
+	 * Undocumented variable
+	 *
 	 * @var LoggerInterface
 	 */
 	private LoggerInterface $log;
@@ -33,9 +39,11 @@ class Commands {
 	/**
 	 * Undocumented function
 	 *
-	 * @param LoggerInterface $log Log.
+	 * @param Labels          $labels Labels.
+	 * @param LoggerInterface $log    Log.
 	 */
-	public function __construct( LoggerInterface $log ) {
+	public function __construct( Labels $labels, LoggerInterface $log ) {
+		$this->labels = $labels;
 		$this->log = $log;
 	}
 
@@ -82,32 +90,32 @@ class Commands {
 				break;
 			case 'stand':
 				$name = 'fa-person';
-				$text = 'Standing';
+				$text = $this->labels->get_label( 'Standing' );
 				break;
 			case 'pray':
 				$name = 'fa-person-praying';
-				$text = 'Silent prayer';
+				$text = $this->labels->get_label( 'Silent prayer' );
 				break;
 			case 'sit':
 				$name = 'fa-chair';
-				$text = 'Sitting';
+				$text = $this->labels->get_label( 'Sitting' );
 				break;
 			case 'kneel':
 				$name = 'fa-pray';
-				$text = 'Kneeling';
+				$text = $this->labels->get_label( 'Kneeling' );
 				break;
 			case 'commbread':
 				$name = 'fa-cookie-bite';
-				$text = 'Holy Communion';
+				$text = $this->labels->get_label( 'Holy Communion' );
 				break;
 			case 'commwine':
 				$name = 'fa-wine-glass-alt';
-				$text = 'Holy Communion';
+				$text = $this->labels->get_label( 'Holy Communion' );
 				break;
 			case 'homily':
 				$prefix = 'far';
 				$name = 'fa-comment';
-				$text = 'Homily';
+				$text = $this->labels->get_label( 'Homily' );
 				break;
 		}//end switch
 

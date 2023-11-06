@@ -42,9 +42,6 @@ class Main {
 				BCP47::class => \DI\create( BCP47::class )->constructor(
 					\DI\get( LoggerInterface::class )
 				),
-				Commands::class => \DI\create( Commands::class )->constructor(
-					\DI\get( LoggerInterface::class )
-				),
 				Mysteries::class => \DI\create( Mysteries::class )->constructor(
 					\DI\get( LoggerInterface::class )
 				),
@@ -67,6 +64,10 @@ class Main {
 					\DI\get( BCP47::class ),
 					\DI\get( LoggerInterface::class ),
 					\DI\get( Parameters::class )
+				),
+				Commands::class => \DI\create( Commands::class )->constructor(
+					\DI\get( Labels::class ),
+					\DI\get( LoggerInterface::class )
 				),
 				Lectionary::class => \DI\create( Lectionary::class )->constructor(
 					\DI\get( Calendar::class ),
