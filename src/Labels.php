@@ -225,6 +225,8 @@ class Labels {
 			throw new InvalidArgumentException( self::class . '::' . __FUNCTION__ . ' - param "content" is empty.' );
 		}
 
+		$safe_content = strtolower( htmlspecialchars( $content ) );
+
 		$label = null;
 		foreach ( $opt as $opt_val ) {
 			if ( is_array( $opt_val ) !== true ) {
