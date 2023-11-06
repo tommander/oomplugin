@@ -88,6 +88,10 @@ class Commands {
 				$prefix = 'far';
 				$name = 'fa-handshake';
 				break;
+			case 'bible':
+				$prefix = 'far';
+				$name = 'fa-book-bible';
+				break;
 			case 'stand':
 				$name = 'fa-person';
 				$text = $this->labels->get_label( 'Standing' );
