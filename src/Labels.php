@@ -189,7 +189,7 @@ class Labels {
 					<?php
 					$this->loop_languages(
 						function ( string $code ) use ( $list_item, $key, $label ) {
-							$trans = is_string( $list_item[ $code ] ) ? $list_item[ $code ] : $label;
+							$trans = ( isset( $list_item[ $code ] ) && is_string( $list_item[ $code ] ) ) ? $list_item[ $code ] : $label;
 							?>
 				<td><input name="oomlabels-list[<?php echo esc_attr( (string) $key ); ?>][<?php echo esc_attr( $code ); ?>]" id="oomlabels-list_<?php echo esc_attr( (string) $key ); ?>_<?php echo esc_attr( $code ); ?>" type="text" value="<?php echo esc_attr( $trans ); ?>" /></td>
 							<?php

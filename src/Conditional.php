@@ -67,7 +67,7 @@ class Conditional {
 	 * @param array{bafiky: array<string, string>} $block_attributes Block attributes.
 	 * @param string                               $content          Content.
 	 * @throws \Exception Wrong global date param.
-	 * @return void
+	 * @return string
 	 */
 	public function render_block( $block_attributes, $content ) {
 		$weekdays = array(
@@ -85,15 +85,15 @@ class Conditional {
 		}
 		$weekday = intval( $date->format( 'w' ) );
 		if ( isset( $weekdays[ $weekday ] ) !== true ) {
-			return;
+			return '';
 		}
 		$weekday_str = $weekdays[ $weekday ];
 		if ( isset( $block_attributes['bafiky'][ $weekday_str ] ) !== true ) {
-			return;
+			return '';
 		}
 		if ( '1' !== $block_attributes['bafiky'][ $weekday_str ] ) {
-			return;
+			return '';
 		}
-		echo wp_kses( $content, 'post' );
+		return wp_kses( $content, 'post' );
 	}
 }
