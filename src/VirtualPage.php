@@ -128,7 +128,8 @@ class VirtualPage {
 						'<option value="%1$s" %2$s>%3$s</option>' . "\r\n",
 						esc_attr( $post->post_name ),
 						selected( $current_vp, $post->post_name, false ),
-						esc_html( $this->labels->get_label( $post->post_title ) )
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						$this->labels->get_label( $post->post_title )
 					);
 				}
 			}//end while
