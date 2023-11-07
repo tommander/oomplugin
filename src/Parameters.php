@@ -68,17 +68,17 @@ class Parameters {
 		if ( self::PARAMETER_TEXTS === $param ) {
 			$curr_post = get_post();
 			if ( is_a( $curr_post, \WP_Post::class ) !== true ) {
-				return 'en-US';
+				return 'en';
 			}
 			if ( $curr_post->post_parent <= 0 ) {
-				return 'en-US';
+				return 'en';
 			}
 			$curr_post_parent = get_post( $curr_post->post_parent );
 			if ( is_a( $curr_post_parent, \WP_Post::class ) !== true ) {
-				return 'en-US';
+				return 'en';
 			}
 			if ( in_array( $curr_post_parent->post_name, array( self::PARAMETER_TYPE_MASS, self::PARAMETER_TYPE_ROSARY, self::PARAMETER_TYPE_BIBLE ), true ) !== true ) {
-				return 'en-US';
+				return 'en';
 			}
 			return $curr_post->post_name;
 		}

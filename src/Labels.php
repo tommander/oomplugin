@@ -275,7 +275,7 @@ class Labels {
 	public function render_options(): void {
 		$current_option = $this->parameters->get_parameter( Parameters::PARAMETER_LABELS );
 		?>
-		<option value="en-US"<?php selected( $current_option, 'en-US' ); ?>>English</option>
+		<option value="en"<?php selected( $current_option, 'en' ); ?>>English</option>
 		<?php
 		$this->loop_languages(
 			function ( string $code ) use ( &$options, $current_option ) {

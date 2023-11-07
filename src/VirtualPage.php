@@ -23,6 +23,12 @@ class VirtualPage {
 	/**
 	 * Undocumented variable
 	 *
+	 * @var Labels
+	 */
+	private Labels $labels;
+	/**
+	 * Undocumented variable
+	 *
 	 * @var LoggerInterface
 	 */
 	private LoggerInterface $log;
@@ -43,11 +49,13 @@ class VirtualPage {
 	/**
 	 * Undocumented function
 	 *
-	 * @param BCP47           $bcp47 BCP47.
-	 * @param LoggerInterface $log   Log.
+	 * @param BCP47           $bcp47  BCP47.
+	 * @param Labels          $labels Labels.
+	 * @param LoggerInterface $log    Log.
 	 */
-	public function __construct( BCP47 $bcp47, LoggerInterface $log ) {
+	public function __construct( BCP47 $bcp47, Labels $labels, LoggerInterface $log ) {
 		$this->bcp47 = $bcp47;
+		$this->labels = $labels;
 		$this->log = $log;
 	}
 
@@ -120,7 +128,7 @@ class VirtualPage {
 						'<option value="%1$s" %2$s>%3$s</option>' . "\r\n",
 						esc_attr( $post->post_name ),
 						selected( $current_vp, $post->post_name, false ),
-						esc_html( $post->post_title )
+						esc_html( $this->labels->get_label( $post->post_title ) )
 					);
 				}
 			}//end while
@@ -223,7 +231,7 @@ class VirtualPage {
 
 		$children = get_page_children( $post->ID, $all_pages );
 		foreach ( $children as $child ) {
-			if ( strcasecmp( $child->post_name, 'en-us' ) === 0 ) {
+			if ( strcasecmp( $child->post_name, 'en' ) === 0 ) {
 				return '<script type="text/javascript">window.location="' . get_permalink( $child ) . '";</script>';
 			}
 		}
