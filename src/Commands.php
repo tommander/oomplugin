@@ -92,6 +92,10 @@ class Commands {
 				$prefix = 'fas';
 				$name = 'fa-book-bible';
 				break;
+			case 'reader':
+				$prefix = 'fas';
+				$name = 'fa-book-reader';
+				break;
 			case 'stand':
 				$name = 'fa-person';
 				$text = $this->labels->get_label( 'Standing' );
