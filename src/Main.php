@@ -77,6 +77,7 @@ class Main {
 				),
 				VirtualPage::class => \DI\create( VirtualPage::class )->constructor(
 					\DI\get( BCP47::class ),
+					\DI\get( Labels::class ),
 					\DI\get( LoggerInterface::class )
 				),
 			)
