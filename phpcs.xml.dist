@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="OomPlugin" xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <description>Order of Mass Plugin coding standard.</description>
+
+    <file>oomplugin.php</file>
+    <file>phpstub-cleaner.php</file>
+    <file>src</file>
+    <file>src/Interfaces</file>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="parallel" value="75"/>
+    <arg value="np"/>
+
+    <rule ref="WordPress">
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+    </rule>
+
+    
+
+</ruleset>

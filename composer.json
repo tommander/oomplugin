@@ -1,0 +1,59 @@
+{
+    "name": "tmd/oomplugin",
+    "description": "Order of Mass Plugin",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomáš Rajnoha",
+            "email": "tomas.rajnoha@tommander.cz",
+            "homepage": "https://tommander.cz",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "oomplugin@tommander.cz",
+        "issues": "https://github.com/tommander/oomplugin/issues",
+        "source": "https://github.com/tommander/oomplugin"
+    },
+    "scripts": {
+        "phpunit": "phpunit",
+        "phpcs": "phpcs",
+        "psalm": "psalm --show-info=true --no-file-cache --no-reflection-cache --no-cache",
+        "generate-stubs": "psalm --no-file-cache --no-cache --no-reflection-cache --generate-stubs=stubs/oomplugin-full.phpstub",
+        "clean-stubs": "php phpstub-cleaner.php --input=stubs/oomplugin-full.phpstub --output-min=stubs/oomplugin-min.phpstub --output=stubs/oomplugin.phpstub",
+        "stubs": [
+            "@generate-stubs",
+            "@clean-stubs"
+        ],
+        "qa": [
+            "@phpcs",
+            "@psalm"
+        ]
+    },
+    "require": {
+        "php-di/php-di": "^7.0",
+        "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7",
+        "vimeo/psalm": "^5.12",
+        "phpunit/phpunit": "^9.6",
+        "ocramius/proxy-manager": "^2.14",
+        "wp-coding-standards/wpcs": "^3.0",
+        "php-stubs/wordpress-stubs": "^6.3",
+        "php-stubs/generator": "^0.8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "TMD\\OrderOfMass\\": "/",
+            "TMD\\OrderOfMass\\Plugin\\": "src/",
+            "TMD\\OrderOfMass\\Plugin\\Interface\\": "src/Interfaces/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
