@@ -6,13 +6,13 @@
     "authors": [
         {
             "name": "Tomáš Rajnoha",
-            "email": "tomas.rajnoha@tommander.cz",
+            "email": "tomas.rajnoha@proton.me",
             "homepage": "https://tommander.cz",
             "role": "Developer"
         }
     ],
     "support": {
-        "email": "oomplugin@tommander.cz",
+        "email": "tomas.rajnoha@proton.me",
         "issues": "https://github.com/tommander/oomplugin/issues",
         "source": "https://github.com/tommander/oomplugin"
     },
