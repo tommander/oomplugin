@@ -7,6 +7,7 @@
 
 namespace TMD\OrderOfMass\Plugin;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -54,8 +55,12 @@ class Parameters {
 			if ( is_a( $curr_post, \WP_Post::class ) !== true ) {
 				return self::PARAMETER_TYPE_MASS;
 			}
-			if ( $curr_post->post_parent > 0 && is_a( get_post( $curr_post->post_parent ), \WP_Post::class ) !== true ) {
-				return self::PARAMETER_TYPE_MASS;
+			if ( $curr_post->post_parent > 0 ) {
+				$parent_post = get_post( $curr_post->post_parent );
+				if ( is_a( $parent_post, \WP_Post::class ) !== true || in_array( $parent_post->post_name, array( self::PARAMETER_TYPE_MASS, self::PARAMETER_TYPE_ROSARY, self::PARAMETER_TYPE_BIBLE ), true ) !== true ) {
+					return self::PARAMETER_TYPE_MASS;
+				}
+				return $parent_post->post_name;
 			}
 			if ( in_array( $curr_post->post_name, array( self::PARAMETER_TYPE_MASS, self::PARAMETER_TYPE_ROSARY, self::PARAMETER_TYPE_BIBLE ), true ) !== true ) {
 				return self::PARAMETER_TYPE_MASS;
