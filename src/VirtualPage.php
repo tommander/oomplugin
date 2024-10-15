@@ -81,6 +81,11 @@ class VirtualPage {
 	 */
 	public function render_metabox() {
 		$oom_virtual_page = '0';
+		/**
+		 * Undocumented variable.
+		 *
+		 * @var \WP_Post|array|null
+		 */
 		$curr_post = get_post();
 		$curr_post_id = 0;
 		if ( is_a( $curr_post, \WP_Post::class ) === true ) {

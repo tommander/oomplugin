@@ -64,11 +64,6 @@ class Labels {
 		$js_languages = array();
 		$this->loop_languages(
 			function ( string $code ) use ( &$js_languages ) {
-				/**
-				 * Undocumented psalm suppress.
-				 *
-				 * @psalm-suppress MixedArrayAssignment
-				 */
 				$js_languages[] = array(
 					'lang' => $this->bcp47->get_lang_name( $code ),
 					'code' => $code,
@@ -145,9 +140,7 @@ class Labels {
 				<td><?php echo esc_html( $lang ); ?></td>
 			</tr>
 					<?php
-					if ( is_int( $key ) ) {
-						$key++;
-					}
+					$key++;
 				}
 			);
 		?>
@@ -198,9 +191,7 @@ class Labels {
 					?>
 			</tr>
 					<?php
-					if ( is_int( $key ) ) {
-						$key++;
-					}
+					$key++;
 				}
 			);
 		?>
@@ -278,7 +269,7 @@ class Labels {
 		<option value="en"<?php selected( $current_option, 'en' ); ?>>English</option>
 		<?php
 		$this->loop_languages(
-			function ( string $code ) use ( &$options, $current_option ) {
+			function ( string $code ) use ( $current_option ) {
 				$lang = $this->bcp47->get_lang_name( $code );
 				?>
 		<option value="<?php echo esc_attr( $code ); ?>"<?php selected( $current_option, $code ); ?>><?php echo esc_html( $lang ); ?></option>';
