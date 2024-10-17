@@ -81,9 +81,12 @@ class Parameters {
 			if ( is_a( $curr_post_parent, \WP_Post::class ) !== true ) {
 				return 'en';
 			}
-			if ( in_array( $curr_post_parent->post_name, array( self::PARAMETER_TYPE_MASS, self::PARAMETER_TYPE_ROSARY, self::PARAMETER_TYPE_BIBLE ), true ) !== true ) {
+
+			/*
+			If ( in_array( $curr_post_parent->post_name, array( self::PARAMETER_TYPE_MASS, self::PARAMETER_TYPE_ROSARY, self::PARAMETER_TYPE_BIBLE ), true ) !== true ) {
 				return 'en';
 			}
+			*/
 			return $curr_post->post_name;
 		}
 		if ( self::PARAMETER_LABELS === $param ) {
