@@ -117,7 +117,14 @@ class VirtualPage {
 	 * @return void
 	 */
 	public function render_options( string $current_vp ) {
-		$query = new \WP_Query( array( 'post_type' => 'page' ) );
+		$query = new \WP_Query(
+			array(
+				'post_type' => 'page',
+				'nopaging' => true,
+				'order' => 'ASC',
+				'orderby' => 'ID',
+			)
+		);
 		try {
 			while ( $query->have_posts() === true ) {
 				$query->the_post();
